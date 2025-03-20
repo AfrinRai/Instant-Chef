@@ -89,7 +89,9 @@ const RecipeDetails = () => {
     
     
 
-    if (!recipe) return <div>Loading...</div>; 
+    if (!recipe) return  <div className="flex justify-center items-center h-screen">
+    <div className="border-t-4 border-blue-500 border-solid w-16 h-16 rounded-full animate-spin"></div>
+  </div>; 
 
     console.log(recipe); // Add this to check the full recipe object
 

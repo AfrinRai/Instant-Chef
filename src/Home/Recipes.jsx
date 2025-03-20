@@ -1,18 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate, useSearchParams } from "react-router-dom"; // ei line baad dibo
-
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
 const Recipes = () => {
     const [searchParams, setSearchParams] = useSearchParams(); 
     const navigate = useNavigate(); 
     const searchIngredient = searchParams.get("search") || "";  // Get search query from URL
 
-
-
-
     const [recipes, setRecipes] = useState([]);
-    ///const [searchIngredient, setSearchIngredient] = useState('');
     const [data, datalength] = useState(6);
+    const [loading, setLoading] = useState(true);  // Added loading state
 
     // Fetch all recipes initially or search results based on ingredient
     useEffect(() => {
@@ -25,8 +21,10 @@ const Recipes = () => {
                 const response = await fetch(url);
                 const data = await response.json();
                 setRecipes(data.recipeData || []); // Update state with the fetched data
+                setLoading(false);  // Set loading to false when data is fetched
             } catch (error) {
                 console.error('Error fetching recipes:', error);
+                setLoading(false);  // Set loading to false if there's an error
             }
         };
 
@@ -37,7 +35,7 @@ const Recipes = () => {
         const query = event.target.value;
         setSearchParams({ search: query }); // Store search term in URL
     };
-    
+
     useEffect(() => {
         const fetchRecipes = async () => {
             const url = searchIngredient
@@ -48,8 +46,10 @@ const Recipes = () => {
                 const response = await fetch(url);
                 const data = await response.json();
                 setRecipes(data.recipeData || []);
+                setLoading(false);  // Set loading to false when data is fetched
             } catch (error) {
                 console.error("Error fetching recipes:", error);
+                setLoading(false);  // Set loading to false if there's an error
             }
         };
     
@@ -67,6 +67,14 @@ const Recipes = () => {
         }
     };
 
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center h-screen">
+                <div className="border-t-4 border-blue-500 border-solid w-16 h-16 rounded-full animate-spin"></div>
+            </div>
+        );
+    }
+
     return (
         <div className="mt-10">
             <h2 className="text-center text-3xl font-black mb-5">Recipes You'll Love</h2>
@@ -80,7 +88,7 @@ const Recipes = () => {
                 <p className="text-lg text-center font-medium mb-4">
                     Find recipes by entering ingredients you have at home!
                 </p>
-                <label className="input input-bordered border-2 flex items-center gap-2  text-center">
+                <label className="input input-bordered border-2 flex items-center gap-2 text-center">
                     <input
                         type="text"
                         className="grow"
@@ -118,33 +126,29 @@ const Recipes = () => {
                                     className="btn p-4 m-2 text-white bg-green-600">
                                     View Details
                                 </Link>
-
                             </div>
                         </div>
                     ))
                 ) : (
                     <div className="col-span-full flex justify-center items-center h-60 w-full">
                         <div className="text-center">
-                            <p >
+                            <p>
                                 No recipes found with ingredient "{searchIngredient}"
                             </p>
-
-                            <p className="text-gray-600">Note:check your spelling is correct!</p>
+                            <p className="text-gray-600">Note: check your spelling is correct!</p>
                             <p>But you can have a look for recipes that include at least one of your ingredients.</p>
-                           <button
+                            <button
                                 onClick={() => handleExploreMoreClick(searchIngredient)}
-                                className="mt-4 btn btn-primary text-white" >
+                                className="mt-4 btn btn-primary text-white">
                                 Explore More Recipes
                             </button>
                         </div>
                     </div>
                 )}
-                <div className='col-span-full flex justify-center items-center my-8'>
-                <div className={data === recipes.length && 'hidden'}>
-                <div className="">
-                    <button onClick={() => datalength(recipes.length)} className='btn btn-primary px-6'>Show all</button>
-                </div>
-            </div>
+                <div className="col-span-full flex justify-center items-center my-8">
+                    <div className={data === recipes.length && 'hidden'}>
+                        <button onClick={() => datalength(recipes.length)} className="btn btn-primary px-6">Show all</button>
+                    </div>
                 </div>
             </div>
         </div>
